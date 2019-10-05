@@ -1,0 +1,197 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+void fill(int n, vector<int>& a, string s)
+{
+	for (int i = n - 1; i >= 0; i--)
+	{
+		char j = s[i];
+		a[a.size() + i - n] = j - '0';
+	}
+}
+
+int maxLength(int n, int k, string s, string s1)
+{
+	if (n > k)
+		return n;
+	else if(k > n)
+		return k;
+	else
+	{
+		int j = n;
+		for (int i = 0; i < n; i++)
+			if (s[i] <s1[i])
+			{
+				j = k;
+				break;
+			}
+		return j;
+	}
+}
+
+void newString(string &s, int &n)
+{
+	for (int i = 0; i < n - 1; i++)
+		s[i] = s[i + 1];
+	n--;
+}
+
+void multiplication(string s, string s1, int n, int k, int x, int y)
+{
+	if (k > n)
+	{
+		string t = s;
+		s = s1;
+		s1 = t;
+		int i = k;
+		k = n;
+		n = i;
+	}
+	vector<int> a(n, 0);
+	vector<int> b(k, 0);
+	vector<int> c(n + k, 0);
+	fill(n, a, s);
+	fill(k, b, s1);
+	int pos = -1;
+	for (int i = n - 1; i >= 0; i--)
+	{
+		pos++;
+		for (int j = k - 1; j >= 0; j--)
+		{
+			c[pos] += a[i] * b[j];
+			c[pos + 1] = c[pos] / 10;
+			c[pos] %= 10;
+			pos++;
+		}
+		pos -= k;
+	}
+	if (x - y)
+		cout << "-";
+	for (int i = n + k - 1 - !(c[n + k - 1]); i >= 0; i--)
+		cout << c[i];
+}
+
+void sum(string s, string s1, int n, int k)
+{
+	if (k > n)
+	{
+		string t = s;
+		s = s1;
+		s1 = t;
+		int i = k;
+		k = n;
+		n = i;
+	}
+	vector<int> a(n + 1, 0);
+	vector<int> b(n + 1, 0);
+	fill(n, a, s);
+	fill(k, b, s1);
+	for (int i = n; i >= n - k; i--)
+	{
+		a[i] += b[i];
+		if (a[i] >= 10)
+		{
+			a[i] %= 10;
+			a[i - 1] += 1;
+		}
+	}
+	for (int i = !(a[0]); i < n + 1; i++)
+		cout << a[i];
+}
+
+void minus1(string s, string s1, int n, int k)
+{
+	int max = maxLength(n, k, s, s1);
+	vector<int> a(max, 0);
+	vector<int> b(max, 0);
+	fill(n, a, s);
+	fill(k, b, s1);
+	if (max == n)
+	{
+		for (int i = max - 1; i > 0; i--)
+		{
+			a[i] = a[i] - b[i];
+			if (a[i] < 0)
+			{
+				a[i] += 10;
+				a[i - 1] --;
+			}
+		}
+		for (int i = !(a[0]); i < max; i++)
+			cout << a[i];
+	}
+	else
+	{
+		for (int i = max - 1; i > 0; i--)
+		{
+			b[i] = b[i] - a[i];
+			if (b[i] < 0)
+			{
+				b[i] += 10;
+				b[i - 1] --;
+			}
+		}
+		cout << "-";
+		for (int i = !(b[0]); i < max; i++)
+			cout << b[i];
+	}
+}
+
+int main()
+{
+	string s = "";
+	cin >> s;
+	char operation;
+	cin >> operation;
+	string s1 = "";
+	cin >> s1;
+	int n = s.length();
+	int k = s1.length();
+	int x = 0;
+	int y = 0;
+	if (s[0] == '-')
+	{
+		newString(s, n);
+		x = 1;
+	}
+	if (s1[0] == '-')
+	{
+		newString(s1, k);
+		y = 1;
+	}
+	switch (operation)
+	{
+	case '+':
+		if (x == 1 && y == 1)
+		{
+			cout << '-';
+			sum(s, s1, n, k);
+		}
+		else if (x == 1)
+			minus1(s1, s, k, n);
+		else if (y == 1)
+			minus1(s, s1, n, k);
+		else sum(s, s1, n, k);
+		break;
+	case '-':
+		if (x == 1 && y == 1)
+			minus1(s1, s, k, n);
+		else if (x == 1)
+		{
+			cout << '-';
+			sum(s1, s, k, n);
+		}
+		else if (y == 1)
+			sum(s, s1, n, k);
+		else minus1(s, s1, n, k);
+		break;
+	case '*':
+		multiplication(s, s1, n, k, x, y);
+		break;
+	default:
+		cout << "No such operation" << endl;
+	}
+	return 0;
+}
