@@ -1,0 +1,125 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+using namespace std;
+
+struct point
+{
+	int xpos;
+	int ypos;
+};
+
+struct dis
+{
+	point start;
+	point finish;
+	int d;
+};
+
+bool same(point a, point b)
+{
+	return (a.xpos == b.xpos && a.ypos == b.ypos);
+}
+
+void find_in_range(vector<dis> b, point a, int ran, vector<point> &gr)
+{
+	for (int i = 0; i < b.size(); i++)
+	{
+		if (same(b[i].start, a) && b[i].d <= ran)
+		{
+			bool res = true;
+			for (int j = 0; j < gr.size(); j++)
+				if (same(gr[j], b[i].finish))
+				{
+					res = false;
+					j = gr.size();
+				}
+			if (res)
+			{
+				gr.push_back(b[i].finish);
+				find_in_range(b, b[i].finish, ran, gr);
+			}
+		}
+		if (same(b[i].finish, a) && b[i].d <= ran)
+		{
+			bool res = true;
+			for (int j = 0; j < gr.size(); j++)
+				if (same(gr[j], b[i].start))
+				{
+					res = false;
+					j = gr.size();
+				}
+			if (res)
+			{
+				gr.push_back(b[i].start);
+				find_in_range(b, b[i].start, ran, gr);
+			}
+		}
+	}
+}
+
+int newran(vector<dis> a)
+{
+	int ran = 0;
+	for (int i = 0; i < a.size(); i++)
+		ran += a[i].d;
+	ran /= a.size();
+	ran = sqrt(ran);
+	return ran;
+}
+
+int main()
+{
+	int n;
+	cout << "Enter number of points ";
+	cin >> n;
+	vector<point> a(n);
+	for (int i = 0; i < n; i++)
+	{
+		cout << "Enter coordinates of " << i << " point." << endl;
+		cin >> a[i].xpos;
+		cin >> a[i].ypos;
+	}
+
+	int lenvec = n * (n - 1) / 2;
+	vector<dis> b(lenvec);
+	int k = 0;
+	for (int i = 0; i < n; i++)
+		for (int j = i + 1; j < n; j++)
+		{
+			b[k].d = sqrt((a[i].xpos - a[j].xpos) * (a[i].xpos - a[j].xpos) + (a[i].ypos - a[j].ypos) * (a[i].ypos - a[j].ypos));
+			b[k].start = a[i];
+			b[k].finish = a[j];
+			k++;
+		}
+
+	int ran = newran(b);
+
+	vector<vector<point>> groups;
+	for (int i = 0; i < n; i++)
+	{
+		bool res = true;
+		for (int j = 0; j < groups.size(); j++)
+			for (int k = 0; k < groups[j].size(); k++)
+				if (same(a[i], groups[j][k]))
+				{
+					res = false;
+				}
+		if (res)
+		{
+			vector<point> c;
+			c.push_back(a[i]);
+			find_in_range(b, a[i], ran, c);
+			groups.push_back(c);
+
+		}
+	}
+	for (int j = 0; j < groups.size(); j++)
+	{
+		for (int k = 0; k < groups[j].size(); k++)
+			cout << "(" << groups[j][k].xpos << ", " << groups[j][k].ypos << ") ";
+		cout << endl;
+	}
+	return 0;
+}
