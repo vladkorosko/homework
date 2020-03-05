@@ -2,7 +2,6 @@
 
 void interactive_mode()
 {
-	int id = 0;
 	array_list* Array_list = new struct array_list();
 	vector_list* Vector_list = new struct vector_list();
 	Linked_list* linked_list = new struct Linked_list();
