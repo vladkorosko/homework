@@ -407,7 +407,7 @@ public:
 	IP get(int index)override
 	{
 		ListNode* current_node = head;
-		for (int i = 1; i < index; i++)
+		for (int i = 0; i < index; i++)
 		{
 			current_node = current_node->next;
 		}
@@ -417,7 +417,7 @@ public:
 	void set(int index, IP element)override
 	{
 		ListNode* current_node = head;
-		for (int i = 1; i < index; i++)
+		for (int i = 0; i < index; i++)
 		{
 			current_node = current_node->next;
 		}
